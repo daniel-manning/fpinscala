@@ -1,5 +1,7 @@
 package chapter04
 
+import chapter03.{Cons, List}
+
 //sealed trait Option[+A]
 case class Some[+A](get: A) extends Option[A]
 case object None extends Option[Nothing]
@@ -37,4 +39,22 @@ sealed trait Option[+A] {
   def orElse2[B >: A](ob: => Option[B]): Option[B] = this map (Some(_)) getOrElse ob
 
   def filter2(f: A => Boolean): Option[A] = flatMap(a => if(f(a)) Some(a) else None)
+}
+
+object OptionFunctions{
+
+  def mean(xs: Seq[Double]): Option[Double] =
+    if (xs.isEmpty) None
+    else Some(xs.sum / xs.length)
+
+  def variance(xs: Seq[Double]): Option[Double] = mean(xs).map(m => xs.map(y => math.pow(y - m, 2)).sum / xs.length)
+  def areEqualDouble(a:Double, b:Double, precision:Int): Boolean = Math.abs(a - b) <= Math.pow(10, -precision)
+
+  def map2[A,B,C](a: Option[A], b: Option[B])(f: (A, B) => C): Option[C] = {
+    a.flatMap(sa => b.map(sb => f(sa, sb)))
+  }
+
+  def sequence[A](a: List[Option[A]]): Option[List[A]] = {
+    a.foldRight[Option[List[A]]](Some(List()))((a:Option[A], b:Option[List[A]]) => b.flatMap(sb => a.map(sa => Cons(sa, sb))))
+  }
 }

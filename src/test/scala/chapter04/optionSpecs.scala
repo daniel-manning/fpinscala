@@ -1,6 +1,7 @@
 package chapter04
 
 import org.scalatest.{FlatSpec, Matchers}
+import chapter03.{Cons, List}
 
 class optionSpecs extends FlatSpec with Matchers {
 
@@ -108,6 +109,44 @@ class optionSpecs extends FlatSpec with Matchers {
   "filter2" should "map over None" in {
     val none = None
     none.filter2(isEven) shouldBe None
+  }
+
+  "varience" should "give the correct result for list of numbers" in {
+    val someList = Seq(1.1,2.2,3.3,4.4)
+    assert(OptionFunctions.areEqualDouble(OptionFunctions.variance(someList).getOrElse(0.0), 1.5125, 4))
+  }
+
+  "varience" should "give the correct result for empty list" in {
+    val none = Seq.empty
+    OptionFunctions.variance(none) shouldBe None
+  }
+
+  "map2" should "give the correct result for supplied params" in {
+    OptionFunctions.map2(Some(4), Some(2))((a:Int,b:Int) => a + b) shouldBe Some(6)
+  }
+
+  it should "give the correct result for None first param" in {
+    OptionFunctions.map2(None, Some(2))((a:Int,b:Int) => a + b) shouldBe None
+  }
+
+  it should "give the correct result for None second param" in {
+    OptionFunctions.map2(Some(2), None)((a:Int,b:Int) => a + b) shouldBe None
+  }
+
+  it should "give the correct result for None params" in {
+    OptionFunctions.map2(None, None)((a:Int,b:Int) => a + b) shouldBe None
+  }
+
+  "sequence" should "give the correct result for a list of all some" in {
+    val testData = List(Some(1), Some(2), Some(3))
+    val expectedResult: Option[List[Int]] = Some(List(1, 2, 3))
+    OptionFunctions.sequence(testData) shouldBe expectedResult
+  }
+
+  it should "give the correct result of None for list containing None" in {
+    val testData = List(Some(1), None, Some(3))
+    val expectedResult: Option[List[Int]] = None
+    OptionFunctions.sequence(testData) shouldBe expectedResult
   }
 
 }
