@@ -3,6 +3,9 @@ package chapter04
 import org.scalatest.{FlatSpec, Matchers}
 import chapter03.{Cons, List}
 
+import scala.util.Try
+
+
 class optionSpecs extends FlatSpec with Matchers {
 
   def sqrt(n:Int) = if(n<0) None else Some(Math.sqrt(n))
@@ -147,6 +150,19 @@ class optionSpecs extends FlatSpec with Matchers {
     val testData = List(Some(1), None, Some(3))
     val expectedResult: Option[List[Int]] = None
     OptionFunctions.sequence(testData) shouldBe expectedResult
+  }
+
+
+  "traverse" should "give the correct result for a list of all correct" in {
+    val testData:List[String] = List("1", "2", "3")
+    val expectedResult: Option[List[Int]] = Some(List(1, 2, 3))
+    OptionFunctions.traverse[String, Int](testData)((s:String) => OptionFunctions.withTry(Try(s.toInt))) shouldBe expectedResult
+  }
+
+  it should "give the correct result of None for list containing None" in {
+    val testData:List[String] = List("1", "&", "3")
+    val expectedResult: Option[List[Int]] = None
+    OptionFunctions.traverse[String, Int](testData)((s:String) => OptionFunctions.withTry(Try(s.toInt))) shouldBe expectedResult
   }
 
 }
