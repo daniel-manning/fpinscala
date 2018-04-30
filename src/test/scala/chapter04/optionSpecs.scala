@@ -165,4 +165,16 @@ class optionSpecs extends FlatSpec with Matchers {
     OptionFunctions.traverse[String, Int](testData)((s:String) => OptionFunctions.withTry(Try(s.toInt))) shouldBe expectedResult
   }
 
+  "sequence2" should "give the correct result for a list of all some" in {
+    val testData = List(Some(1), Some(2), Some(3))
+    val expectedResult: Option[List[Int]] = Some(List(1, 2, 3))
+    OptionFunctions.sequence2(testData) shouldBe expectedResult
+  }
+
+  it should "give the correct result of None for list containing None" in {
+    val testData = List(Some(1), None, Some(3))
+    val expectedResult: Option[List[Int]] = None
+    OptionFunctions.sequence2(testData) shouldBe expectedResult
+  }
+
 }

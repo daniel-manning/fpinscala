@@ -70,4 +70,8 @@ object OptionFunctions{
   def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = {
     a.foldRight[Option[List[B]]](Some(List()))((a:A, b:Option[List[B]]) => b.flatMap(sb => f(a).map(sa => Cons(sa, sb))))
   }
+
+  def sequence2[A](a: List[Option[A]]): Option[List[A]] = {
+    traverse(a)(x => x)
+  }
 }
