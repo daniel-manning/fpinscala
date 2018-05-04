@@ -6,7 +6,7 @@ import chapter03.{Cons, List}
 import scala.util.Try
 
 
-class optionSpecs extends FlatSpec with Matchers {
+class OptionSpecs extends FlatSpec with Matchers {
 
   def sqrt(n:Int) = if(n<0) None else Some(Math.sqrt(n))
   def isEven(n:Int) = n % 2 == 0
