@@ -42,4 +42,6 @@ object EitherFunctions {
   def traverse[E, A, B](as: List[A])(f: A => Either[E, B]): Either[E, List[B]] = {
     as.foldRight[Either[E, List[B]]](Right(List()))((a:A, b:Either[E, List[B]]) => b.flatMap(c => f(a).map(sa => Cons(sa, c))))
   }
+
+  def sequence2[E, A](es: List[Either[E, A]]): Either[E, List[A]] = traverse(es)(x => x)
 }

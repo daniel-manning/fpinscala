@@ -74,4 +74,16 @@ class EitherSpecs extends FlatSpec with Matchers {
     val expectedResult: Either[String, List[Int]] = Left("Try has failed!")
     EitherFunctions.traverse(testData)((s:String) => EitherFunctions.withTry(Try(s.toInt))) shouldBe expectedResult
   }
+
+  "sequence2" should "give the correct result for a list of all data" in {
+    val testData: List[Either[String, Int]] = List(Right(1), Right(2), Right(3))
+    val expectedResult: Either[String, List[Int]] = Right(List(1, 2, 3))
+    EitherFunctions.sequence2(testData) shouldBe expectedResult
+  }
+
+  it should "give the correct result of None for list containing Left" in {
+    val testData: List[Either[String, Int]] = List(Right(1), Left(""), Right(3))
+    val expectedResult: Either[String, List[Int]] = Left("")
+    EitherFunctions.sequence2(testData) shouldBe expectedResult
+  }
 }
