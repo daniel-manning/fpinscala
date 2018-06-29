@@ -58,17 +58,25 @@ sealed trait Stream[+A]{
 
   def map[B](f: A => B):Stream[B] = foldRight(empty[B])((h, b) => cons(f(h), b))
 
-  def filter(f: A => Boolean): Stream[A] = foldRight(empty[A])((h, b) => if(f(h)) cons(h, b) else b)
+  def filter(p: A => Boolean): Stream[A] = foldRight(empty[A])((h, b) => if(p(h)) cons(h, b) else b)
 
   def append[B >: A](b:Stream[B]):Stream[B] = foldRight(b)((h, t) => cons(h,t))
 
-  def flatMap[B](f: A => Stream[B]):Stream[B] = ???
+  def flatMap[B](f: A => Stream[B]):Stream[B] = foldRight(empty[B])((h, b) => f(h) append b)
 }
 
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
 
 object Stream {
+  def fibs:Stream[Int] = add(0, 1)
+
+  private def add(x:Int, y:Int):Stream[Int] = Cons(() => x, () => add(y, x + y))
+
+  def from(i: Int):Stream[Int] = Cons(() => i, () => from(i+1))
+
+  def constant[A](i: A):Stream[A] = Cons(() => i, () => constant(i))
+
 
   def cons[A](hd: => A, tl: => Stream[A]): Stream[A] = {
     lazy val head = hd

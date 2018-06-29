@@ -36,7 +36,7 @@ class StreamSpecs extends FlatSpec with Matchers {
     Stream(2,4,5,8).forAll(_ % 2 == 0) shouldBe false
   }
 
- /* "takeWhile2" should "keep the first items Satisfying a predicate" in {
+  "takeWhile2" should "keep the first items Satisfying a predicate" in {
     Stream(2,4,6,8,9,11).takeWhile2(_ % 2 == 0).toList shouldBe List(2,4,6,8)
   }
 
@@ -66,5 +66,17 @@ class StreamSpecs extends FlatSpec with Matchers {
 
   "flatMap" should "take a function making lists and flatten them" in {
     Stream(1, 2, 3).flatMap(i => Stream(i,i)).toList shouldBe List(1, 1, 2, 2, 3, 3)
-  }*/
+  }
+
+  "constant" should "return an infinite stream of a given value" in {
+    Stream.constant(5).take(5).toList shouldBe List(5,5,5,5,5)
+  }
+
+  "from" should "return an infinite stream of incrementing integers" in {
+    Stream.from(0).take(5).toList shouldBe List(0,1,2,3,4)
+  }
+
+  "fibonnaci" should "return an infinite Stream of fibonacci numbers" in {
+    Stream.fibs.take(7).toList shouldBe List(0,1,1,2,3,5,8)
+  }
 }
