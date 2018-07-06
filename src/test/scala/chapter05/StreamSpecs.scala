@@ -79,4 +79,25 @@ class StreamSpecs extends FlatSpec with Matchers {
   "fibonnaci" should "return an infinite Stream of fibonacci numbers" in {
     Stream.fibs.take(7).toList shouldBe List(0,1,1,2,3,5,8)
   }
+
+  "unfold" should "return an infinite Stream of fibonacci numbers given a fibonacci function" in {
+    Stream.unfold(0)(x => Some((x, x+1))).take(7).toList shouldBe List(0,1,2,3,4,5,6)
+  }
+
+  "unfold" should "return an infinite Stream of fibonacci numbers" in {
+    Stream.fibs1.take(7).toList shouldBe List(0,1,1,2,3,5,8)
+  }
+
+  "unfold" should "return an infinite stream of incrementing integers" in {
+    Stream.from1(0).take(5).toList shouldBe List(0,1,2,3,4)
+  }
+
+  "unfold" should "return an infinite stream of a given value" in {
+    Stream.constant1(5).take(5).toList shouldBe List(5,5,5,5,5)
+  }
+
+  "unfold" should "return an infinite stream of ones" in {
+    Stream.ones1.take(5).toList shouldBe List(1,1,1,1,1)
+  }
+
 }

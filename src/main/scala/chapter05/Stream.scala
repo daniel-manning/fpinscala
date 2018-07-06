@@ -63,12 +63,31 @@ sealed trait Stream[+A]{
   def append[B >: A](b:Stream[B]):Stream[B] = foldRight(b)((h, t) => cons(h,t))
 
   def flatMap[B](f: A => Stream[B]):Stream[B] = foldRight(empty[B])((h, b) => f(h) append b)
+
 }
 
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
 
 object Stream {
+
+  def constant1(i: Int): Stream[Int] = unfold(i)(x => Some((x, x)))
+
+  def ones1 : Stream[Int] = unfold(1)(x => Some((1, 1)))
+
+
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = {
+    f(z) match {
+      case Some((x, y)) => Cons(() => x, () => unfold(y)(f))
+      case None => Stream.empty
+    }
+  }
+
+
+  def fibs1:Stream[Int] = unfold((0,1)) ( s => Some((s._1,(s._2, s._1 + s._2))) )
+
+  def from1(i: Int):Stream[Int] = unfold(i)(s => Some((s, s+1)))
+
   def fibs:Stream[Int] = add(0, 1)
 
   private def add(x:Int, y:Int):Stream[Int] = Cons(() => x, () => add(y, x + y))
