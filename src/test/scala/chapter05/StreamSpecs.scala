@@ -100,4 +100,34 @@ class StreamSpecs extends FlatSpec with Matchers {
     Stream.ones1.take(5).toList shouldBe List(1,1,1,1,1)
   }
 
+  "map1" should "return a transformed stream" in {
+    val numberStream = Stream(1,2,3)
+    numberStream.map1(x => x + 1).toList shouldBe List(2,3,4)
+  }
+
+  "take1" should "return first n elements of a stream" in {
+    val numberStream = Stream(1,2,3,4,5,6,7,8)
+    numberStream.take1(4).toList shouldBe List(1,2,3,4)
+  }
+
+  "takeWhile1" should "return first elements of a stream which match the predicate" in {
+    val numberStream = Stream(1,2,3,4,5,6,7,8)
+    def predicate: Int => Boolean = (x:Int) => x < 5
+    numberStream.takeWhile1(predicate).toList shouldBe List(1,2,3,4)
+  }
+
+  "zipWith" should "return a stream zipped from two others" in {
+    val firstStream = Stream(1,2,3,4,5,6)
+    val secondStream = Stream(7,8,9,10,11,12)
+
+    Stream.zipWith(firstStream, secondStream, (x:Int, y:Int) => x * y).toList shouldBe List(7, 16, 27, 40, 55, 72)
+  }
+
+  "zipAll" should "return a stream zipped from two others" in {
+    val firstStream = Stream(1,2,3,4,5,6)
+    val secondStream = Stream(7,8,9,10)
+
+    firstStream.zipAll(secondStream).toList shouldBe List((Some(1), Some(7)), (Some(2), Some(8)), (Some(3), Some(9)),
+      (Some(4), Some(10)), (Some(5), None), (Some(6), None))
+  }
 }

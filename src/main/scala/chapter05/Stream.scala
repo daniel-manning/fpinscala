@@ -4,6 +4,21 @@ import chapter05.Stream._
 
 sealed trait Stream[+A]{
 
+  def map1[B](f:A => B):Stream[B] = unfold(this) {
+    case Cons(h, t) => Some((f(h()), t()))
+    case _ => None
+  }
+
+  def take1(i: Int):Stream[A] = unfold((i,this)){
+    case (n , Cons(h, t)) if n > 0 => Some((h(), (n-1, t())))
+    case _ => None
+  }
+
+  def takeWhile1(p: A => Boolean):Stream[A] = unfold(this){
+    case Cons(h, t) if p(h()) => Some((h(), t()))
+    case _ => None
+  }
+
   def drop(n: Int):Stream[A] = {
     this match {
       case Cons(h, t) if(n > 0) => t().drop(n - 1)
@@ -64,6 +79,12 @@ sealed trait Stream[+A]{
 
   def flatMap[B](f: A => Stream[B]):Stream[B] = foldRight(empty[B])((h, b) => f(h) append b)
 
+  def zipAll[B](s2: Stream[B]): Stream[(Option[A],Option[B])] = unfold((this, s2)){
+    case (Empty, Empty) => None
+    case (Cons(a, ta), Empty) => Some(((Some(a()), None), (ta(), Empty)))
+    case (Empty, Cons(b, tb)) => Some(((None, Some(b())), (Empty, tb())))
+    case (Cons(a, ta), Cons(b, tb)) => Some(((Some(a()), Some(b())), (ta(), tb())))
+  }
 }
 
 case object Empty extends Stream[Nothing]
@@ -96,6 +117,11 @@ object Stream {
 
   def constant[A](i: A):Stream[A] = Cons(() => i, () => constant(i))
 
+  def zipWith[A,B,C](streamA:Stream[A], streamB:Stream[B], f:(A, B) => C):Stream[C] = unfold((streamA, streamB)) {
+    case (_, Empty) => None
+    case (Empty, _) => None
+    case (Cons(a, ta), Cons(b, tb)) => Some((f(a(), b()), (ta(), tb())))
+  }
 
   def cons[A](hd: => A, tl: => Stream[A]): Stream[A] = {
     lazy val head = hd
