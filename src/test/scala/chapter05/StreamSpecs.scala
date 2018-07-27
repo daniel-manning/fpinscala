@@ -120,7 +120,7 @@ class StreamSpecs extends FlatSpec with Matchers {
     val firstStream = Stream(1,2,3,4,5,6)
     val secondStream = Stream(7,8,9,10,11,12)
 
-    Stream.zipWith(firstStream, secondStream, (x:Int, y:Int) => x * y).toList shouldBe List(7, 16, 27, 40, 55, 72)
+    Stream.zipWith1(firstStream, secondStream, (x:Int, y:Int) => x * y).toList shouldBe List(7, 16, 27, 40, 55, 72)
   }
 
   "zipAll" should "return a stream zipped from two others" in {
@@ -130,4 +130,17 @@ class StreamSpecs extends FlatSpec with Matchers {
     firstStream.zipAll(secondStream).toList shouldBe List((Some(1), Some(7)), (Some(2), Some(8)), (Some(3), Some(9)),
       (Some(4), Some(10)), (Some(5), None), (Some(6), None))
   }
+
+  "startsWith" should "return true if stream starts with test stream" in {
+    Stream(1,2,3) startsWith Stream(1,2) shouldBe true
+  }
+
+  "tails" should "return a stream of tails for stream members" in {
+    Stream(1,2,3).tails.toList.map(_.toList) shouldBe Stream(Stream(1,2,3), Stream(2,3), Stream(3), Stream()).toList.map(_.toList)
+  }
+
+  "scanRight" should "return a stream of " ignore {
+    Stream(1,2,3).scanRight(0)(_ + _).toList shouldBe List(6,5,3,0)
+  }
+
 }

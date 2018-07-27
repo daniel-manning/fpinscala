@@ -4,9 +4,9 @@ import chapter05.Stream._
 
 sealed trait Stream[+A]{
 
-  def map1[B](f:A => B):Stream[B] = unfold(this) {
+  def map1[B](f: A => B):Stream[B] = unfold(this){
     case Cons(h, t) => Some((f(h()), t()))
-    case _ => None
+    case Empty => None
   }
 
   def take1(i: Int):Stream[A] = unfold((i,this)){
@@ -85,12 +85,31 @@ sealed trait Stream[+A]{
     case (Empty, Cons(b, tb)) => Some(((None, Some(b())), (Empty, tb())))
     case (Cons(a, ta), Cons(b, tb)) => Some(((Some(a()), Some(b())), (ta(), tb())))
   }
+
+  def startsWith[A](prefix:Stream[A]):Boolean = this.zipAll(prefix).takeWhile(_._2.isDefined).forAll(p => p._1 == p._2)
+
+  def tails:Stream[Stream[A]] = unfold(this){
+    case Empty => None
+    case Cons(h, t) => Some((Cons(h, t), t()))
+  } append Stream(Stream())
+
+  def scanRight[B](z: => B)(f: (A, => B) => B):Stream[B] = ???
+
+  //this.tails.map(_.foldRight(z)(f))
+
+
 }
 
 case object Empty extends Stream[Nothing]
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
 
 object Stream {
+
+  def zipWith1[A,B,C](streamA:Stream[A], streamB:Stream[B], f:(A, B) => C):Stream[C] = unfold((streamA, streamB)){
+    case (Cons(h1, t1), Cons(h2, t2)) => Some((f(h1(), h2()), (t1(), t2())))
+    case _ => None
+  }
+
 
   def constant1(i: Int): Stream[Int] = unfold(i)(x => Some((x, x)))
 
