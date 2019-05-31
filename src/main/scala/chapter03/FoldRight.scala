@@ -30,6 +30,13 @@ object FoldRight {
     go(z, as)
   }
 
+  def foldLeft2[A,B](as: List[A], z: B)(f: (B, A) => B): B = {
+    as match {
+        case Nil => z
+        case Cons(l, ls) => foldLeft2(ls, f(z, l))(f)
+      }
+    }
+
   /*def foldLeft2[A,B](as: List[A], z: B)(f: (B, A) => B): B = {
      foldRight(as,identity())((b,g,x) => g(f(x,b)))
   }
@@ -59,12 +66,10 @@ object FoldRight {
   }
 
   def filter[A](as: List[A])(p: A => Boolean): List[A] = {
-    foldRight(as, List[A]())((a:A,b:List[A]) => if(p(a))Cons(a,b) else b)
+    foldRight(as, List[A]())((a:A,b:List[A]) => if(p(a)) Cons(a,b) else b)
   }
 
   def flatMap[A,B](as: List[A])(f: A => List[B]): List[B] = {
-    /*val a:List[List[B]] = map(as)(f)
-    flatten(a)*/
     flatten(map(as)(f))
   }
 
@@ -90,18 +95,18 @@ object FoldRight {
     }
   }
 
-  def zipWith[A,B,C](as: List[A], bs: List[B], f:(A,B) => C):List[C] = {
+  def zipWith[A,B,C](as: List[A], bs: List[B])(f:(A,B) => C):List[C] = {
     (as,bs) match {
       case (Nil, _) => Nil
       case (_, Nil) => Nil
-      case (Cons(a,at), Cons(b,bt)) => Cons(f(a,b), zipWith(at, bt, f))
+      case (Cons(a,at), Cons(b,bt)) => Cons(f(a,b), zipWith(at, bt)(f))
     }
   }
 
   def hasSubsequence[A](sup: List[A], sub: List[A]): Boolean = {
     (sup,sub) match {
-      case (Nil, _) => true
       case (_, Nil) => true
+      case (Nil, _) => false
       case (Cons(a,at), Cons(b,bt)) => if(a == b) hasSubsequence(at,bt) else hasSubsequence(at,sub)
     }
   }

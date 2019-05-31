@@ -68,7 +68,7 @@ class FoldRightSpec extends FlatSpec with Matchers {
   }
 
   "zipWith" should "add corresponding elements of two lists" in {
-    FoldRight.zipWith(List(1,2,3), List(4,5,6), (a:Int,b:Int)=> a*b) shouldBe List(4,10,18)
+    FoldRight.zipWith(List(1,2,3), List(4,5,6))((a:Int,b:Int)=> a*b) shouldBe List(4,10,18)
   }
 
   "hasSubsequence" should "find subsequence after a close match" in {
