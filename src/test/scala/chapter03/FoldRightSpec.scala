@@ -75,7 +75,11 @@ class FoldRightSpec extends FlatSpec with Matchers {
     FoldRight.hasSubsequence(List(1,2,5,1,2,3), List(1,2,3)) shouldBe true
   }
 
-  "hasSubsequence" should "not find a subsequence for a near match" ignore {
+  "hasSubsequence" should "not find a subsequence for a near match" in {
     FoldRight.hasSubsequence(List(1,2,5,1), List(1,2,3)) shouldBe false
+  }
+
+  "hasSubsequence" should "not find a subsequence longer than the list" in {
+    FoldRight.hasSubsequence(List(1,2,5,1), List(5,1,3)) shouldBe false
   }
 }
