@@ -33,29 +33,25 @@ case class Branch[A](left: Tree[A], right: Tree[A]) extends Tree[A]
       }
     }
 
-    def fold[A,B](tree: Tree[A], z:A => B, f:(B,B) => B): B = {
+    def fold[A,B](tree: Tree[A], z:A => B)(f:(B,B) => B): B = {
       tree match {
         case Leaf(a) => z(a)
-        case Branch(left, right) => f(fold(left,z,f),fold(right,z,f))
+        case Branch(left, right) => f(fold(left,z)(f),fold(right,z)(f))
       }
     }
 
 
-    def size2[A](tree: Tree[A]): Int = {
-      fold(tree, (a:A) => 1, (a:Int,b:Int) => 1 + a + b)
-    }
+    def size2[A](tree: Tree[A]): Int =
+      fold(tree, (a:A) => 1)((a:Int,b:Int) => 1 + a + b)
 
-    def maximum2(tree:Tree[Int]):Int = {
-      fold(tree, (a:Int) => a, (a:Int,b:Int) => a.max(b))
-    }
+    def maximum2(tree:Tree[Int]):Int =
+      fold(tree, (a:Int) => a)((a:Int,b:Int) => a.max(b))
 
-    def depth2(tree: Tree[Int]): Int = {
-      fold(tree, (a:Int) => 1, (a:Int,b:Int) => 1 + a.max(b))
-    }
+    def depth2[A](tree: Tree[A]): Int =
+      fold(tree, (a:A) => 1)((a:Int,b:Int) => 1 + a.max(b))
 
-    def map2[A,B](tree: Tree[A], f:A => B): Tree[B] = {
-      fold(tree, (a:A) => Leaf(f(a)), (a:Tree[B],b:Tree[B]) => Branch(a,b))
-    }
+    def map2[A,B](tree: Tree[A], f:A => B): Tree[B] =
+      fold[A, Tree[B]](tree, (a:A) => Leaf(f(a)))((a:Tree[B],b:Tree[B]) => Branch(a,b))
 
 
   }
