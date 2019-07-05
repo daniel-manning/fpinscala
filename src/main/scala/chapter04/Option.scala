@@ -64,14 +64,14 @@ object OptionFunctions{
   }
 
   def sequence[A](a: List[Option[A]]): Option[List[A]] = {
-    a.foldRight[Option[List[A]]](Some(List()))((a:Option[A], b:Option[List[A]]) => b.flatMap(sb => a.map(sa => Cons(sa, sb))))
+    a.foldRight[Option[List[A]]](Some(List[A]()))((a, b) => map2(b, a)((la, a) => Cons(a, la)))
   }
 
   def traverse[A, B](a: List[A])(f: A => Option[B]): Option[List[B]] = {
-    a.foldRight[Option[List[B]]](Some(List()))((a:A, b:Option[List[B]]) => b.flatMap(sb => f(a).map(sa => Cons(sa, sb))))
+    a.foldRight[Option[List[B]]](Some(List[B]()))((a, b) => map2(b, f(a))((la, a) => Cons(a, la)))
   }
 
   def sequence2[A](a: List[Option[A]]): Option[List[A]] = {
-    traverse(a)(x => x)
+    traverse(a)(identity)
   }
 }
