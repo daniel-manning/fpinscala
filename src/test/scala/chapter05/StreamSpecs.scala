@@ -139,7 +139,7 @@ class StreamSpecs extends FlatSpec with Matchers {
     Stream(1,2,3).tails.toList.map(_.toList) shouldBe Stream(Stream(1,2,3), Stream(2,3), Stream(3), Stream()).toList.map(_.toList)
   }
 
-  "scanRight" should "return a stream of " ignore {
+  "scanRight" should "return a stream of " in {
     Stream(1,2,3).scanRight(0)(_ + _).toList shouldBe List(6,5,3,0)
   }
 

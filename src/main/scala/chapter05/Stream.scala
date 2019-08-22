@@ -93,9 +93,7 @@ sealed trait Stream[+A]{
     case Cons(h, t) => Some((Cons(h, t), t()))
   } append Stream(Stream())
 
-  def scanRight[B](z: => B)(f: (A, => B) => B):Stream[B] = ???
-
-  //this.tails.map(_.foldRight(z)(f))
+  def scanRight[B](z: => B)(f: (A, => B) => B):Stream[B] = this.tails.map(_.foldRight(z)(f))
 
 
 }
