@@ -79,4 +79,17 @@ class RngSpecs extends FlatSpec with Matchers with PropertyChecks {
     }
   }
 
+
+  "sequence" should "return a random list from a list of randoms" in {
+    forAll(longs) { seed =>
+      val rng = SimpleRNG(seed)
+
+      val listOfRandoms = List(RNG.randDoubleInt, RNG.randDoubleInt, RNG.randDoubleInt)
+
+      val randomList = RNG.sequence(listOfRandoms)
+
+      println(randomList(rng))
+    }
+  }
+
 }
