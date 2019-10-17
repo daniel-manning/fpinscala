@@ -1,5 +1,7 @@
 package chapter06
 
+case class Rand[S, A] extends State[RNG, A](run: RNG => (A,RNG))
+
 trait RNG {
   def nextInt: (Int, RNG)
 }
@@ -11,13 +13,16 @@ object RNG {
   def unit[A](a: A): Rand[A] =
     rng => (a, rng)
 
-  def map[A,B](s: Rand[A])(f: A => B): Rand[B] =
+  def map[A, B](s: Rand[A])(f: A => B): Rand[B] =
     rng => {
       val (a, rng2) = s(rng)
       (f(a), rng2)
     }
 
-  def flatMap[A,B](f: Rand[A])(g: A => Rand[B]): Rand[B] = {
+  def mapDash[A, B](s: Rand[A])(f: A => B): Rand[B] =
+    flatMap(s)(a => unit(f(a)))
+
+  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = {
     rng => {
       val (a, rng2) = f(rng)
       g(a)(rng2)
@@ -25,9 +30,10 @@ object RNG {
   }
 
   def nonNegativeLessThan(n: Int): Rand[Int] =
-    flatMap(nonNegativeInt){
-      i => val mod = i % n
-        if (i + (n-1) - mod >= 0)
+    flatMap(nonNegativeInt) {
+      i =>
+        val mod = i % n
+        if (i + (n - 1) - mod >= 0)
           unit(mod)
         else nonNegativeLessThan(n)
     }
@@ -36,14 +42,21 @@ object RNG {
     map(nonNegativeInt)(i => i - i % 2)
 
   def double2: Rand[Double] =
-    map(nonNegativeInt)(i => i.toDouble/Int.MaxValue.toDouble)
+    map(nonNegativeInt)(i => i.toDouble / Int.MaxValue.toDouble)
 
-  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
-    rng =>  {
+  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
+    rng => {
       val (a, rng2) = ra(rng)
       val (b, rng3) = rb(rng2)
 
       (f(a, b), rng3)
+    }
+  }
+
+  def map2Dash[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+  flatMap(ra) {a =>
+    map(rb){ b =>
+        f(a,b)
     }
   }
 
