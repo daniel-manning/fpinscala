@@ -1,6 +1,5 @@
+/*
 package chapter06
-
-case class Rand[S, A] extends State[RNG, A](run: RNG => (A,RNG))
 
 trait RNG {
   def nextInt: (Int, RNG)
@@ -8,44 +7,43 @@ trait RNG {
 
 object RNG {
 
-  val int: Rand[Int] = _.nextInt
+  type Rand[+A] = RNG => (A, RNG)
 
-  def unit[A](a: A): Rand[A] =
-    rng => (a, rng)
+  def unit[A](a: A): State[RNG, A] =
+    State(rng => (a, rng))
 
-  def map[A, B](s: Rand[A])(f: A => B): Rand[B] =
-    rng => {
-      val (a, rng2) = s(rng)
+  def map[A,B](s: State[RNG, A])(f: A => B): State[RNG, B] =
+    State(rng => {
+      val (a, rng2) = s.run(rng)
       (f(a), rng2)
-    }
+    })
 
-  def mapDash[A, B](s: Rand[A])(f: A => B): Rand[B] =
+  def mapDash[A,B](s: State[RNG, A])(f: A => B): State[RNG, B] =
     flatMap(s)(a => unit(f(a)))
 
-  def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = {
-    rng => {
-      val (a, rng2) = f(rng)
-      g(a)(rng2)
-    }
+  def flatMap[A,B](f: State[RNG, A])(g: A => State[RNG, B]): State[RNG, B] = {
+    State(rng => {
+      val (a, rng2) = f.run(rng)
+      g(a).run(rng2)
+    })
   }
 
   def nonNegativeLessThan(n: Int): Rand[Int] =
-    flatMap(nonNegativeInt) {
-      i =>
-        val mod = i % n
-        if (i + (n - 1) - mod >= 0)
+    flatMap(nonNegativeInt){
+      (i:Int) => val mod = i % n
+        if (i + (n-1) - mod >= 0)
           unit(mod)
         else nonNegativeLessThan(n)
     }
 
-  def nonNegativeEven: Rand[Int] =
+  def nonNegativeEven: State[RNG, Int] =
     map(nonNegativeInt)(i => i - i % 2)
 
-  def double2: Rand[Double] =
-    map(nonNegativeInt)(i => i.toDouble / Int.MaxValue.toDouble)
+  def double2: State[RNG, Double] =
+    map(nonNegativeInt)(i => i.toDouble/Int.MaxValue.toDouble)
 
-  def map2[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = {
-    rng => {
+  def map2[A,B,C](ra: State[RNG, A], rb: State[RNG, B])(f: (A, B) => C): State[RNG, C] = {
+    rng =>  {
       val (a, rng2) = ra(rng)
       val (b, rng3) = rb(rng2)
 
@@ -53,22 +51,15 @@ object RNG {
     }
   }
 
-  def map2Dash[A, B, C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
-  flatMap(ra) {a =>
-    map(rb){ b =>
-        f(a,b)
-    }
-  }
-
-  def both[A,B](ra: Rand[A], rb: Rand[B]): Rand[(A,B)] =
+  def both[A,B](ra: State[RNG, A], rb: State[RNG, B]): State[RNG, (A,B)] =
     map2(ra, rb)((_, _))
 
-  val randIntDouble: Rand[(Int, Double)] =
+  val randIntDouble: State[RNG, (Int, Double)] =
     both(int, double)
-  val randDoubleInt: Rand[(Double, Int)] =
+  val randDoubleInt: State[RNG, (Double, Int)] =
     both(double, int)
 
-  def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = {
+  def sequence[A](fs: List[State[RNG, A]]): State[RNG, List[A]] = {
     rng => {
       fs.foldRight((List.empty[A], rng)){
         (a, b) => {
@@ -80,12 +71,14 @@ object RNG {
     }
   }
 
+  @scala.annotation.tailrec
   def nonNegativeInt(rng: RNG): (Int, RNG) = {
     val (intValue, rngNext) = rng.nextInt
     if(intValue >= 0) (intValue, rngNext)
     else nonNegativeInt(rngNext)
   }
 
+  @scala.annotation.tailrec
   def double(rng: RNG): (Double, RNG) = {
     val (intValue, rngNext) = nonNegativeInt(rng)
     if(intValue != Int.MaxValue){
@@ -130,3 +123,4 @@ case class SimpleRNG(seed:Long) extends RNG
     (n, nextRNG)
   }
 }
+*/

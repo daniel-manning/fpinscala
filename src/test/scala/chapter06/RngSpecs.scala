@@ -5,7 +5,7 @@ import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
 
 
-class RngSpecs extends FlatSpec with Matchers with PropertyChecks {
+/*class RngSpecs extends FlatSpec with Matchers with PropertyChecks {
 
   val longs: Gen[Long] = Gen.chooseNum(Long.MinValue, Long.MaxValue)
 
@@ -92,4 +92,4 @@ class RngSpecs extends FlatSpec with Matchers with PropertyChecks {
     }
   }
 
-}
+}*/
