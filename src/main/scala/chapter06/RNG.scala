@@ -2,20 +2,18 @@
 package chapter06
 
 trait RNG {
-  def nextInt: (Int, RNG)
+  def nextInt: (RNG, Int)
 }
 
 object RNG {
 
-  type Rand[+A] = RNG => (A, RNG)
-
- def unit[A](a: A): State[RNG, A] =
-    State(rng => (a, rng))
+  def unit[A](a: A): State[RNG, A] =
+    State(rng => (rng, a))
 
   def map[A,B](s: State[RNG, A])(f: A => B): State[RNG, B] =
     State(rng => {
-      val (a, rng2) = s.run(rng)
-      (f(a), rng2)
+      val (rng2, a) = s.run(rng)
+      (rng2, f(a))
     })
 
   def mapDash[A,B](s: State[RNG, A])(f: A => B): State[RNG, B] =
@@ -23,59 +21,59 @@ object RNG {
 
   def flatMap[A,B](f: State[RNG, A])(g: A => State[RNG, B]): State[RNG, B] = {
     State(rng => {
-      val (a, rng2) = f.run(rng)
+      val (rng2, a) = f.run(rng)
       g(a).run(rng2)
     })
   }
 
-  /*def nonNegativeLessThan(n: Int): Rand[Int] =
-    flatMap(nonNegativeInt){
-      (i:Int) => val mod = i % n
-        if (i + (n-1) - mod >= 0)
-          unit(mod)
-        else nonNegativeLessThan(n)
-    }
-
   def nonNegativeEven: State[RNG, Int] =
-    map(nonNegativeInt)(i => i - i % 2)
+    map(State(rng => nonNegativeInt(rng)))(i => i - i % 2)
 
   def double2: State[RNG, Double] =
-    map(nonNegativeInt)(i => i.toDouble/Int.MaxValue.toDouble)*/
+    map(State(rng => nonNegativeInt(rng)))(i => i.toDouble/Int.MaxValue.toDouble)
 
   def map2[A,B,C](ra: State[RNG, A], rb: State[RNG, B])(f: (A, B) => C): State[RNG, C] =
     State {
       (rng: RNG) =>  {
-        val (a, rng2) = ra.run(rng)
-        val (b, rng3) = rb.run(rng2)
+        val (rng2, a) = ra.run(rng)
+        val (rng3, b) = rb.run(rng2)
 
-        (f(a, b), rng3)
+        (rng3, f(a, b))
       }
     }
 
   def both[A,B](ra: State[RNG, A], rb: State[RNG, B]): State[RNG, (A,B)] =
     map2(ra, rb)((_, _))
 
-/*  val randIntDouble: State[RNG, (Int, Double)] =
-      both((rng: RNG) => (rng.nextInt), double)
+  val randIntDouble: State[RNG, (Int, Double)] =
+      both(State(_.nextInt), State(double))
 
   val randDoubleInt: State[RNG, (Double, Int)] =
-    both(double, int)
+    both(State(double), State(_.nextInt))
 
-  def sequence[A](fs: List[State[RNG, A]]): State[RNG, List[A]] = {
-    rng => {
-      fs.foldRight((List.empty[A], rng)){
+  def sequence[A](fs: List[State[RNG, A]]): State[RNG, List[A]] =
+    State( rng => {
+      fs.foldRight((rng, List.empty[A])){
         (a, b) => {
-          val (na, nrng) = a(b._2)
-
-          (na :: b._1, nrng)
+          val (nrng, na) = a.run(b._1)
+          (nrng, na :: b._2)
         }
       }
-    }
-  }*/
+    })
+
+  def nonNegativeLessThan(n: Int): State[RNG, Int] =
+   flatMap(State(rng => nonNegativeInt(rng))){
+     (i:Int) => {
+       val mod = i % n
+       if (i + (n-1) - mod >= 0)
+         unit(mod)
+       else nonNegativeLessThan(n)
+     }
+   }
 
   @scala.annotation.tailrec
   def nonNegativeInt(rng: RNG): (RNG, Int) = {
-    val (intValue, rngNext) = rng.nextInt
+    val (rngNext, intValue) = rng.nextInt
     if(intValue >= 0) (rngNext, intValue)
     else nonNegativeInt(rngNext)
   }
@@ -84,7 +82,7 @@ object RNG {
   def double(rng: RNG): (RNG, Double) = {
     val (rngNext, intValue) = nonNegativeInt(rng)
     if(intValue != Int.MaxValue){
-      (rngNext, intValue.toDouble/Int.MaxValue.toDouble)
+      (rngNext, (intValue.toDouble/Int.MaxValue.toDouble))
     }else{
       double(rngNext)
     }
@@ -109,19 +107,22 @@ object RNG {
     (rng3, (double1, double2, double3))
   }
 
-  /*def ints(count: Int)(rng: RNG): (RNG, List[Int]) = {
-    (1 to count).foldRight((List[Int](), rng)) {
-      (_, b) => { val (intVal, rngNext) = b._2.nextInt; ( b._1 :+ intVal, rngNext)}
+  def ints(count: Int)(rng: RNG): (RNG, List[Int]) =
+    (1 to count).foldRight((rng, List[Int]())) {
+        (_, b) => {
+          val (rngNext, intVal) = b._1.nextInt
+          (rngNext, b._2 :+ intVal)
+        }
     }
-  }*/
+
 }
 
 case class SimpleRNG(seed:Long) extends RNG
 {
-  def nextInt: (Int, RNG) = {
+  def nextInt: (RNG, Int) = {
     val newSeed = (seed * 0x5DEECE66DL + 0xBL) & 0xFFFFFFFFFFFFL
     val nextRNG = SimpleRNG(newSeed)
     val n = (newSeed >>> 16).toInt
-    (n, nextRNG)
+    (nextRNG, n)
   }
 }

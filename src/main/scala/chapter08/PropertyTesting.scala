@@ -1,6 +1,5 @@
 package chapter08
-/*
-import chapter06.{RNG, State}*/
+
 import cats.data.State
 import chapter06.{RNG, SimpleRNG}
 
@@ -37,7 +36,7 @@ object Gen {
       .map(n => start + n % (stopExclusive - start)))
 
   def boolean: Gen[Boolean] = Gen(State{rng =>
-    val (int, rngNext) = rng.nextInt
+    val (rngNext, int) = rng.nextInt
     if(int < 0) (rngNext, false)
     else (rngNext, true)
   })

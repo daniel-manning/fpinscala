@@ -5,14 +5,14 @@ import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
 
 
-/*class RngSpecs extends FlatSpec with Matchers with PropertyChecks {
+class RngSpecs extends FlatSpec with Matchers with PropertyChecks {
 
   val longs: Gen[Long] = Gen.chooseNum(Long.MinValue, Long.MaxValue)
 
   "rng nonnegative number" should "return a value between 0 and Int.Max" in {
     forAll(longs){ seed =>
       val rng = SimpleRNG(seed)
-      val (randomValue, _) = RNG.nonNegativeInt(rng)
+      val (_, randomValue) = RNG.nonNegativeInt(rng)
       randomValue >= 0 shouldBe true
       randomValue <= Int.MaxValue shouldBe true
     }
@@ -21,7 +21,7 @@ import org.scalatest.{FlatSpec, Matchers}
   "rng double" should "return a double value between 0 and 1" in {
     forAll(longs) { seed =>
       val rng = SimpleRNG(seed)
-      val (randomValue: Double, _) = RNG.double(rng)
+      val (_, randomValue: Double) = RNG.double(rng)
       randomValue >= 0 shouldBe true
       randomValue < 1 shouldBe true
     }
@@ -30,7 +30,7 @@ import org.scalatest.{FlatSpec, Matchers}
   "rng intDouble" should "return an (int, double) tuple" in {
     forAll(longs) { seed =>
       val rng = SimpleRNG(seed)
-      val ((intValue, doubleValue), _) = RNG.intDouble(rng)
+      val (_, (intValue, doubleValue)) = RNG.intDouble(rng)
       intValue >= 0 shouldBe true
       intValue <= Int.MaxValue shouldBe true
       doubleValue >= 0 shouldBe true
@@ -41,7 +41,7 @@ import org.scalatest.{FlatSpec, Matchers}
   "rng doubleInt" should "return a (double, int) tuple" in {
     forAll(longs) { seed =>
       val rng = SimpleRNG(seed)
-      val ((doubleValue, intValue), _) = RNG.doubleInt(rng)
+      val (_, (doubleValue, intValue)) = RNG.doubleInt(rng)
       intValue >= 0 shouldBe true
       intValue <= Int.MaxValue shouldBe true
       doubleValue >= 0 shouldBe true
@@ -52,7 +52,7 @@ import org.scalatest.{FlatSpec, Matchers}
   "rng double3" should "return a (double, double, double) 3-tuple" in {
     forAll(longs) { seed =>
       val rng = SimpleRNG(seed)
-      val ((double1, double2, double3), _) = RNG.double3(rng)
+      val (_, (double1, double2, double3)) = RNG.double3(rng)
       double1 >= 0 shouldBe true
       double1 < 1 shouldBe true
       double2 >= 0 shouldBe true
@@ -65,7 +65,7 @@ import org.scalatest.{FlatSpec, Matchers}
   "rng ints" should "return a list of ints" in {
     forAll(longs) { seed =>
       val rng = SimpleRNG(seed)
-      val intList = RNG.ints(5)(rng)._1
+      val intList = RNG.ints(5)(rng)._2
       intList.length shouldBe 5
     }
   }
@@ -73,14 +73,14 @@ import org.scalatest.{FlatSpec, Matchers}
   "rng double2" should "return a double value between 0 and 1" in {
     forAll(longs) { seed =>
       val rng = SimpleRNG(seed)
-      val (randomValue: Double, _) = RNG.double2(rng)
+      val (_, randomValue: Double) = RNG.double2.run(rng)
       randomValue >= 0 shouldBe true
       randomValue < 1 shouldBe true
     }
   }
 
 
-  "sequence" should "return a random list from a list of randoms" in {
+  "sequence" should "return a random list from a list of randoms" ignore {
     forAll(longs) { seed =>
       val rng = SimpleRNG(seed)
 
@@ -88,8 +88,8 @@ import org.scalatest.{FlatSpec, Matchers}
 
       val randomList = RNG.sequence(listOfRandoms)
 
-      println(randomList(rng))
+      println(randomList.run(rng))
     }
   }
 
-}*/
+}
